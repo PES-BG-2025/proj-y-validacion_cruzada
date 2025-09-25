@@ -1,0 +1,137 @@
+---
+title: CVR CON regresión lineal
+jupyter: python3
+format:
+    html: 
+        toc: true
+        code-fold: true
+---
+
+```{python}
+
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_validate, GridSearchCV, cross_val_predict
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score, f1_score, classification_report, confusion_matrix, RocCurveDisplay, PrecisionRecallDisplay
+import matplotlib.pyplot as plt
+from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score
+
+
+df = pd.read_csv("base_proyecto.csv", sep = ",", index_col=0)
+```
+
+```{python}
+
+#volvemos matrices los datos que sacamos del dataset
+""" 
+aux_EDAD = np.array(df["grupos_de_edad"]).reshape(9450, 1)
+aux_ingresos = np.array(df["ingresos"]).reshape(9450, 1)
+aux_estudios = np.array(df["nivel_de_estudios"]).reshape(9450, 1)
+"""
+#construyo la matiz x
+X_generador = df.iloc[:,[2,4]]
+
+#construyo el vector Y
+y_generador = df.iloc[:,1]
+
+X, x_descartado, y, y_descartado = train_test_split( X_generador,y_generador, test_size = 0.95, random_state = 0)         
+
+h = 0.2 
+c = 1.0
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+```
+
+```{python}
+x_entrenador, x_provador, y_entrenador, y_provador = train_test_split( X,y, test_size = 0.40, random_state = 0) 
+```
+
+
+
+```{python}
+#svm LINEAL 
+lineal_svc = SVC(kernel= "linear", C=c)
+#entrenamos el modelo
+lineal_svc.fit(x_entrenador,y_entrenador)
+```
+
+```{python}
+y_predecida = lineal_svc.predict(x_provador)
+print("Precisión:", accuracy_score(y_provador, y_predecida))
+```
+
+
+
+```{python}
+scores = cross_val_score(lineal_svc, x_provador, y_provador, cv=5)
+scores
+print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
+```
+
+```{python}
+
+scores = cross_val_score(lineal_svc, x_entrenador, y_entrenador, cv=5, scoring='f1_macro')
+scores
+print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
+```
+
+# CVR Regresion RBF GAUSSIANO
+
+```{python}
+rbf_svc = SVC(kernel= "rbf", C=c, gamma=0.7)
+#entrenamos el modelo
+rbf_svc.fit(x_entrenador,y_entrenador)
+```
+
+```{python}
+y_predecida = rbf_svc.predict(x_provador)
+print("Precisión:", accuracy_score(y_provador, y_predecida))
+```
+
+```{python}
+scores = cross_val_score(rbf_svc, x_provador, y_provador, cv=5)
+scores
+print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
+```
+
+```{python}
+scores = cross_val_score(rbf_svc, X, y, cv=5, scoring='f1_macro')
+scores
+print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
+```
+
+# CVR Con Red neuronal (Perceptron) 
+
+```{python}
+perceptron_clf = MLPClassifier(solver='lbfgs', alpha=1,hidden_layer_sizes=(5, 2))
+#entrenamos el modelo
+perceptron_clf.fit(x_entrenador,y_entrenador)
+```
+
+```{python}
+perceptron_clf.score(x_provador, y_provador)
+print("Precisión:", accuracy_score(y_provador, y_predecida))
+```
+
+```{python}
+
+scores = cross_val_score(perceptron_clf, x_provador, y_provador, cv=5)
+scores
+print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
+```
+
+```{python}
+scores = cross_val_score(perceptron_clf, x_provador, y_provador, cv=5, scoring='f1_macro')
+scores
+print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
+```
+
+
+
+

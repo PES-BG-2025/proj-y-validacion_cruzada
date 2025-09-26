@@ -60,7 +60,12 @@ x_entrenador, x_provador, y_entrenador, y_provador = train_test_split( X,y, test
 
 ```
 
-# CVR CON regresión lineal
+# SVC CON regresión lineal
+
+Resuelve el siguiente problema primal:
+
+$\min_{w,b}\frac{1}{2}w^Tw + C\sum_{}^{i=1}\max(0,y_{i}(w^T\phi(x_{i})+b))$
+
 
 ```{python}
 """
@@ -96,8 +101,11 @@ print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scor
 """
 ```
 
-# CVR Regresion RBF GAUSSIANO
-
+# SVC Regresion RBF GAUSSIANO
+-RBF es un núcleo estacionario. También se conoce como núcleo «exponencial cuadrado».
+viene dado por:
+$k(x_{i},x_{j}) = \exp(-\frac{d(x_{i},x_{j})^2}{2l^2})$
+    
 ```{python}
 rbf_svc = SVC(kernel= "rbf", C=c, gamma=0.7)
 #entrenamos el modelo
@@ -121,7 +129,10 @@ scores
 print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
 ```
 
-# Red neuronal (Perceptron) 
+# Modelo de Redes neuronal (Supervisadas,MPL) 
+-El MPL se entrena utilizando el descenso de gradiente estocástico:
+
+$w\gets w-\eta(\alpha\frac{\partial R(w)}{\partial w}+\frac{\partial Loss}{\partial w})$
 
 ```{python}
 perceptron_clf = MLPClassifier(solver='lbfgs', alpha=1,hidden_layer_sizes=(5, 2))

@@ -1,14 +1,20 @@
 ---
-title: CVR CON regresión lineal
+title: Validación Cruzada
 jupyter: python3
 format:
-    html: 
-        toc: true
-        code-fold: true
+    revealjs:
+        theme: night 
+    pptx: default  
+
 ---
+# Maquinas de vectores de soporte
+(support vector machines, SVM)
 
+Son un conjunto de métodos de aprendizaje supervisado que se utilizan para la clasificación (SVC), la regresión(SVR) y la detección de valores atípicos. 
+
+# Librerias que se utilizan
 ```{python}
-
+#| echo: true
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_validate, GridSearchCV, cross_val_predict
@@ -21,8 +27,8 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score
-
-
+```
+```{python}
 df = pd.read_csv("base_proyecto.csv", sep = ",", index_col=0)
 ```
 
@@ -49,36 +55,45 @@ cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 ```
 
 ```{python}
+
 x_entrenador, x_provador, y_entrenador, y_provador = train_test_split( X,y, test_size = 0.40, random_state = 0) 
+
 ```
 
-
+# CVR CON regresión lineal
 
 ```{python}
+"""
 #svm LINEAL 
 lineal_svc = SVC(kernel= "linear", C=c)
 #entrenamos el modelo
 lineal_svc.fit(x_entrenador,y_entrenador)
+"""
 ```
 
 ```{python}
+"""
 y_predecida = lineal_svc.predict(x_provador)
 print("Precisión:", accuracy_score(y_provador, y_predecida))
+"""
 ```
 
-
+ 
 
 ```{python}
+"""
 scores = cross_val_score(lineal_svc, x_provador, y_provador, cv=5)
 scores
 print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
+"""
 ```
 
 ```{python}
-
+"""
 scores = cross_val_score(lineal_svc, x_entrenador, y_entrenador, cv=5, scoring='f1_macro')
 scores
 print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
+"""
 ```
 
 # CVR Regresion RBF GAUSSIANO
@@ -106,7 +121,7 @@ scores
 print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
 ```
 
-# CVR Con Red neuronal (Perceptron) 
+# Red neuronal (Perceptron) 
 
 ```{python}
 perceptron_clf = MLPClassifier(solver='lbfgs', alpha=1,hidden_layer_sizes=(5, 2))
@@ -131,6 +146,7 @@ scores = cross_val_score(perceptron_clf, x_provador, y_provador, cv=5, scoring='
 scores
 print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
 ```
+
 
 
 

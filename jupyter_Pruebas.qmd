@@ -1,16 +1,46 @@
 ---
-title: Validación Cruzada
+title: Modelos de Machine learning con Validación cruzada para predecir niveles de  pobreza en Guatemala
 jupyter: python3
 format:
     revealjs:
-        theme: night 
+        theme: moon 
     pptx: default  
 
 ---
+
+# Integrantes
+
+Kevin Alexander Molina Portales
+
+Pedro Miguel Monzón Castellanos
+
+
+# Datos 
+
+obtenidos de la Encuesta Nacional de Condiciones de Vida realizada por el INE
+![encovi](encovi.jpg)
+
+# Aprendizaje Supervisado
+
+El aprendizaje supervisado es un tipo de machine learning.
+
+El proceso implica que el modelo aprenda la relación entre los datos de entrada (características) y las salidas correctas (etiquetas), para luego aplicar este conocimiento a nuevos datos no etiquetados. 
+
+
+
 # Maquinas de vectores de soporte
 (support vector machines, SVM)
 
 Son un conjunto de métodos de aprendizaje supervisado que se utilizan para la clasificación (SVC), la regresión(SVR) y la detección de valores atípicos. 
+
+# Validación cruzada
+Para evitarla el sobreajuste se mantiene una parte de los datos disponibles como un conjunto de prueba y otro conjunto de entrenamiento
+![Esquema](gridvc.png)
+
+# Proceso de Validación cruzada
+Se sigue el siguiente procedimiento para las k «partes» 
+![tabla](VC.png)
+
 
 # Librerias que se utilizan
 ```{python}
@@ -26,22 +56,22 @@ from sklearn.metrics import accuracy_score, f1_score, classification_report, con
 import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import accuracy_score
+from sklearn.datasets import make_moons
+from sklearn.model_selection import train_test_split
 ```
+
+# Mandamos a llamar Nuestro DataSet
 ```{python}
+#| echo: true
 df = pd.read_csv("base_proyecto.csv", sep = ",", index_col=0)
 ```
 
 ```{python}
-
+#| echo: true
 #volvemos matrices los datos que sacamos del dataset
-""" 
-aux_EDAD = np.array(df["grupos_de_edad"]).reshape(9450, 1)
-aux_ingresos = np.array(df["ingresos"]).reshape(9450, 1)
-aux_estudios = np.array(df["nivel_de_estudios"]).reshape(9450, 1)
-"""
+
 #construyo la matiz x
-X_generador = df.iloc[:,[2,4]]
+X_generador = df.iloc[:,[2,3]]
 
 #construyo el vector Y
 y_generador = df.iloc[:,1]
@@ -68,37 +98,41 @@ $\min_{w,b}\frac{1}{2}w^Tw + C\sum_{}^{i=1}\max(0,y_{i}(w^T\phi(x_{i})+b))$
 
 
 ```{python}
-"""
+
+#| echo: true
 #svm LINEAL 
 lineal_svc = SVC(kernel= "linear", C=c)
 #entrenamos el modelo
 lineal_svc.fit(x_entrenador,y_entrenador)
-"""
+print(" ")
+
 ```
 
+# Resultados
 ```{python}
-"""
+
 y_predecida = lineal_svc.predict(x_provador)
 print("Precisión:", accuracy_score(y_provador, y_predecida))
-"""
+
+
 ```
 
  
 
 ```{python}
-"""
-scores = cross_val_score(lineal_svc, x_provador, y_provador, cv=5)
+
+scores = cross_val_score(lineal_svc, x_entrenador, y_entrenador, cv=5)
 scores
 print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
-"""
+
 ```
 
 ```{python}
-"""
+
 scores = cross_val_score(lineal_svc, x_entrenador, y_entrenador, cv=5, scoring='f1_macro')
 scores
 print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
-"""
+
 ```
 
 # SVC Regresion RBF GAUSSIANO
@@ -107,26 +141,29 @@ viene dado por:
 $k(x_{i},x_{j}) = \exp(-\frac{d(x_{i},x_{j})^2}{2l^2})$
     
 ```{python}
+#| echo: true
 rbf_svc = SVC(kernel= "rbf", C=c, gamma=0.7)
 #entrenamos el modelo
 rbf_svc.fit(x_entrenador,y_entrenador)
+print(" ")
 ```
 
+# Resultados
 ```{python}
 y_predecida = rbf_svc.predict(x_provador)
 print("Precisión:", accuracy_score(y_provador, y_predecida))
 ```
 
 ```{python}
-scores = cross_val_score(rbf_svc, x_provador, y_provador, cv=5)
+scores = cross_val_score(rbf_svc, x_entrenador, y_entrenador, cv=5)
 scores
 print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
 ```
 
 ```{python}
-scores = cross_val_score(rbf_svc, X, y, cv=5, scoring='f1_macro')
+scores = cross_val_score(rbf_svc, x_entrenador, y_entrenador, cv=5, scoring='f1_macro')
 scores
-print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
+print("%0.2f f1_macro con desviación estandar de %0.2f" % (scores.mean(), scores.std()))
 ```
 
 # Modelo de Redes neuronal (Supervisadas,MPL) 
@@ -135,11 +172,14 @@ print("%0.2f Exactitud con desviación estandar de %0.2f" % (scores.mean(), scor
 $w\gets w-\eta(\alpha\frac{\partial R(w)}{\partial w}+\frac{\partial Loss}{\partial w})$
 
 ```{python}
+#| echo: true
 perceptron_clf = MLPClassifier(solver='lbfgs', alpha=1,hidden_layer_sizes=(5, 2))
 #entrenamos el modelo
 perceptron_clf.fit(x_entrenador,y_entrenador)
+print(" ")
 ```
 
+# resultados
 ```{python}
 perceptron_clf.score(x_provador, y_provador)
 print("Precisión:", accuracy_score(y_provador, y_predecida))
@@ -147,18 +187,71 @@ print("Precisión:", accuracy_score(y_provador, y_predecida))
 
 ```{python}
 
-scores = cross_val_score(perceptron_clf, x_provador, y_provador, cv=5)
+scores = cross_val_score(perceptron_clf, x_entrenador, y_entrenador, cv=5)
 scores
 print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
 ```
 
 ```{python}
-scores = cross_val_score(perceptron_clf, x_provador, y_provador, cv=5, scoring='f1_macro')
+scores = cross_val_score(perceptron_clf, x_entrenador, y_entrenador, cv=5, scoring='f1_macro')
 scores
 print("%0.6f Exactitud con desviación estandar de %0.6f" % (scores.mean(), scores.std()))
 ```
 
+# Grafico (pequeña representación de nuestra regresion lineal)
+```{python}
+
+plt.scatter(
+    df["edad" ],
+    df["ingresos" ],
+    c=df["pobreza_binaria"])
 
 
+plt.xlabel("Ingresos")
+plt.ylabel("Edad")
+plt.title("Ingresos vs Grupo de Edad por POBREZA")
+plt.legend(title="Pobreza" )
+plt.tight_layout()
+plt.show()
 
+```
+
+# Grafico (ilustracion de posible resultado con datos más precisos)
+```{python}
+
+X, y = make_moons(noise=0.3, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 2. Modelos supervisados
+models = {
+    "SVM lineal": SVC(kernel="linear", C=1),
+    "SVM RBF": SVC(kernel="rbf", gamma=0.7, C=1),
+    "Red Neuronal": MLPClassifier(hidden_layer_sizes=(10,), max_iter=2000, random_state=1)
+}
+
+# 3. Ajustar modelos
+for name, clf in models.items():
+    clf.fit(X_train, y_train)
+
+# 4. Función para graficar la frontera de decisión
+def plot_decision_boundary(ax, clf, X, y, title):
+    h = 0.02
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    ax.contourf(xx, yy, Z, alpha=0.3, cmap=plt.cm.coolwarm)
+    ax.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.coolwarm, edgecolors="k")
+    ax.set_title(title)
+
+# 5. Graficar resultados
+fig, axs = plt.subplots(1, 3, figsize=(15, 4))
+
+for ax, (name, clf) in zip(axs, models.items()):
+    plot_decision_boundary(ax, clf, X, y, name)
+
+plt.show()
+```
 

@@ -8,6 +8,33 @@ Este repositorio tiene como propósito servir de contenedor para los archivos de
 *Programación I*  
 *Fecha: Septiembre de 2025*
 
+## Descripción del proyecto: Validación Cruzada: SVM  y Redes Neuronales
+
+Este proyecto implementa métodos de aprendizaje supervisado (SVM y Redes Neuronales), aplicados a un arreglo de datos con fuente en información de la ENCOVI 2023 (Instituto Nacional de Estadistica -INE-).
+Busca obtener  una demostración de las ventajas y dinámica en el proceso de validación cruzada como un método para determinar métricas que permiten elegir un mejor modelo de predicción, en el contexto de una variable cualitativa, en función de regresoras de orden cuantitativo.
+
+  Contenido:
+- SVM (Support Vector Machines)
+   Kernel: lineal
+   Kernel: RBF (Gaussiano)
+- Red Neuronal (MLPClassifier)
+   Implementación con scikit-learn
+   Descenso de gradiente estocástico
+- Validación cruzada
+   Stratified K-Fold y Comparación de métricas: precisión y F1
+
+  Desarrollo:
+  Se utilizó en su implementación Python 3 y versiones recientes de NameSpaces:
+-  Pandas
+-  Numpy
+-  Mathplotlib
+-  Sk-learn (algoritmo)
+
+  Autores:
+-  Pedro Miguel Monzón Castellanos
+-  Kevin Alexander Molina Portales
+  
+
 ## Objetivos
 
 El presente proyecto tiene como objetivo que el estudiante conozca nuevos paquetes del lenguaje de Python o que desarrolle lógica de programación necesaria para realizar alguna aplicación interesante utilizando programación científica o métodos de simulación de Monte Carlo. 
